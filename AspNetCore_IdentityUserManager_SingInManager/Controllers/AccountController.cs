@@ -13,9 +13,11 @@ namespace AspNetCore_IdentityUserManager_SingInManager.Controllers
         // UserManager sınıfı context sınıfına ihtiyaç duymadan kullanıcı ile ilgili işlemleri yapmak için (kullanıcıyı yönetmek iiçn) kullanılır
 
         UserManager<AppUser> userManager;
-        public AccountController(UserManager<AppUser> _userManager)
+        SignInManager<AppUser> signInManager;
+        public AccountController(UserManager<AppUser> _userManager, SignInManager<AppUser> _signInManager)
         {
             userManager = _userManager;
+            signInManager = _signInManager;
         }
 
         public IActionResult Index()
@@ -23,12 +25,13 @@ namespace AspNetCore_IdentityUserManager_SingInManager.Controllers
             return View();
         }
 
+        // kayıt ekranını açar...
         public IActionResult Register()
         {
             return View();
         }
 
-
+        // Kayıt ol actionı => kayıt işlemlierini yapar
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -50,7 +53,22 @@ namespace AspNetCore_IdentityUserManager_SingInManager.Controllers
                 return View(ModelState);
             }
         }
+
+
+        public IActionResult Login()
+        {
+
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Login(RegisterViewModel model)
+        {
+            var user = await userManager.FindByNameAsync(model.EmailAdress);
+            var result2 = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+
+            return RedirectToAction("Index", "Home");
+        }
     }
-
-
 }
